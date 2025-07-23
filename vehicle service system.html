@@ -1,0 +1,105 @@
+// Project: Vehicle Service Management System (Backend - Spring Boot)
+
+package com.example.vehicleservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class VehicleServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(VehicleServiceApplication.class, args);
+    }
+}
+
+// --- Entity: Vehicle.java ---
+package com.example.vehicleservice.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Vehicle {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String ownerName;
+    private String licensePlate;
+    private String model;
+
+    // Getters and setters
+}
+
+// --- Repository: VehicleRepository.java ---
+package com.example.vehicleservice.repository;
+
+import com.example.vehicleservice.entity.Vehicle;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
+}
+
+// --- Controller: VehicleController.java ---
+package com.example.vehicleservice.controller;
+
+import com.example.vehicleservice.entity.Vehicle;
+import com.example.vehicleservice.repository.VehicleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/vehicles")
+@CrossOrigin(origins = "http://localhost:3000")
+public class VehicleController {
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
+    @GetMapping
+    public List<Vehicle> getAllVehicles() {
+        return vehicleRepository.findAll();
+    }
+
+    @PostMapping
+    public Vehicle addVehicle(@RequestBody Vehicle vehicle) {
+        return vehicleRepository.save(vehicle);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteVehicle(@PathVariable Long id) {
+        vehicleRepository.deleteById(id);
+    }
+}
+
+// React Frontend (basic structure shown as comment):
+// src/components/VehicleForm.js
+/*
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function VehicleForm() {
+  const [vehicle, setVehicle] = useState({ ownerName: '', licensePlate: '', model: '' });
+
+  const handleChange = (e) => {
+    setVehicle({ ...vehicle, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios.post('http://localhost:8080/api/vehicles', vehicle).then(() => alert('Vehicle Added'));
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="ownerName" onChange={handleChange} placeholder="Owner Name" />
+      <input name="licensePlate" onChange={handleChange} placeholder="License Plate" />
+      <input name="model" onChange={handleChange} placeholder="Model" />
+      <button type="submit">Add Vehicle</button>
+    </form>
+  );
+}
+
+export default VehicleForm;
+*/
